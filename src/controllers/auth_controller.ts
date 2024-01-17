@@ -15,7 +15,7 @@ const register = async (req: Request, res: Response) => {
         const sameUser = await User.findOne({ 'email': email });
         if (sameUser) {
             logger.error("email already exists");
-            return res.status(406).send("email already exists");
+            return res.status(409).send("email already exists");
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -25,7 +25,7 @@ const register = async (req: Request, res: Response) => {
         return res.status(201).send(user);
     } catch (err) {
         logger.error('error while trying to register');
-        return res.status(400).send("error while trying to register");
+        return res.status(500).send("error while trying to register");
     }
 }
 
@@ -41,7 +41,7 @@ const login = async (req: Request, res: Response) => {
         const user = await User.findOne({ 'email': email });
         if (!user) {
             logger.error("email is incorrect");
-            return res.status(401).send("email ");
+            return res.status(401).send("email");
         }
 
         const match = await bcrypt.compare(password, user.password);
@@ -65,7 +65,7 @@ const login = async (req: Request, res: Response) => {
         });
     } catch (err) {
         logger.error("error while trying to login");
-        return res.status(400).send("error while trying to login");
+        return res.status(500).send("error while trying to login");
     }
 }
 
@@ -96,7 +96,7 @@ const logout = async (req: Request, res: Response) => {
             }
         } catch (err) {
             logger.error("error while trying to logout");
-            res.sendStatus(401).send('error while trying to logout');
+            res.sendStatus(500).send('error while trying to logout');
         }
     });
 }
@@ -134,7 +134,7 @@ const refresh = async (req: Request, res: Response) => {
             });
         } catch (err) {
             logger.error('error while trying to refresh')
-            res.sendStatus(401).send('error while trying to refresh');
+            res.sendStatus(500).send('error while trying to refresh');
         }
     });
 }

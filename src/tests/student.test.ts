@@ -64,7 +64,7 @@ describe("Student tests", () => {
 
   test("Test Post duplicate Student", async () => {
     const response = await request(app).post("/student").set("Authorization", "JWT " + accessToken).send(student);
-    expect(response.statusCode).toBe(406);
+    expect(response.statusCode).toBe(409);
   });
 
   // test("Test PUT /student/:id", async () => {

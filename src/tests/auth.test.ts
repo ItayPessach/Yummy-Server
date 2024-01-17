@@ -35,7 +35,7 @@ describe("Auth tests", () => {
     const response = await request(app)
       .post("/auth/register")
       .send(user);
-    expect(response.statusCode).toBe(406);
+    expect(response.statusCode).toBe(409);
   });
 
   test("Test Register missing password", async () => {
