@@ -8,7 +8,6 @@ export interface IPost {
   city: string;
   user: string;
   comments: Array<string>;
-  createdAt: Date;
 }
 
 const postSchema = new mongoose.Schema<IPost>({
@@ -42,10 +41,6 @@ const postSchema = new mongoose.Schema<IPost>({
     required: false,
     ref: "Comment",
   },
-  createdAt: {
-    type: Date,
-    required: true,
-  },
-});
+}, { timestamps: true });
 
 export default mongoose.model<IPost>("Post", postSchema);

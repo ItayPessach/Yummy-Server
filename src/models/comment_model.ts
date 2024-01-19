@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 export interface IComment {
   _id: string;
   user: string;
-  createdAt: Date;
   body: string;
 }
 
@@ -17,14 +16,10 @@ const CommentSchema = new mongoose.Schema<IComment>({
     required: true,
     ref: "User",
   },
-  createdAt: {
-    type: Date,
-    required: true,
-  },
   body: {
     type: String,
     required: true,
   },
-});
+}, { timestamps: true });
 
 export default mongoose.model<IComment>("Comment", CommentSchema);
