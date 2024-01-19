@@ -46,8 +46,8 @@ import authController from "../controllers/auth_controller";
  *       example:
  *         email: 'itay@gmail.com'
  *         password: '123456'
- *         fullName: itay pessach
- *         city: Yehud
+ *         fullName: 'itay pessach'
+ *         city: 'Yehud'
  */
 
 /**

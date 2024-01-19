@@ -4,8 +4,8 @@ export interface IUser {
   _id: string;
   email: string;
   password: string;
-  fullName: string;
-  homeCity: string;
+  fullName?: string;
+  homeCity?: string;
   profileImage?: string;
   refreshTokens?: Array<string>;
 }
@@ -21,11 +21,11 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   fullName: {
     type: String,
-    required: true,
+    required: false,
   },
   homeCity: {
     type: String,
-    required: true,
+    required: false,
   },
   profileImage: {
     type: String,

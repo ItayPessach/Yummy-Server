@@ -10,12 +10,12 @@ const bootstrapServer = async () => {
   const port = process.env.port ?? 3000;
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log('development');
+    logger.info('development mode');
     http.createServer(app).listen(port, () => {
       logger.info(`server listening on port ${port}`);
     });
   } else {
-    console.log('production');
+    logger.info('production mode');
     const options = {
       key: fs.readFileSync('../client-key.pem'),
       cert: fs.readFileSync('../client-cert.pem')
