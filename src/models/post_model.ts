@@ -7,40 +7,64 @@ export interface IPost {
   image: string;
   city: string;
   user: string;
-  comments: Array<string>;
+  comments: Array<IComment>;
 }
 
-const postSchema = new mongoose.Schema<IPost>({
-  _id: {
-    type: String,
-    required: true,
+export interface IComment {
+  user: string;
+  body: string;
+  date: Date;
+}
+
+const postSchema = new mongoose.Schema<IPost>(
+  {
+    _id: {
+      type: String,
+      required: true,
+    },
+    restaurant: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+      required: false,
+    },
+    image: {
+      type: String,
+      required: false,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    user: {
+      type: String,
+      required: true,
+      ref: "User",
+    },
+    comments: {
+      type: [
+        {
+          user: {
+            type: String,
+            required: true,
+            ref: "User",
+          },
+          body: {
+            type: String,
+            required: true,
+          },
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+      default: [],
+    },
   },
-  restaurant: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: false,
-  },
-  image: {
-    type: String,
-    required: false,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  user: {
-    type: String,
-    required: true,
-    ref: "User",
-  },
-  comments: {
-    type: [String],
-    required: false,
-    ref: "Comment",
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 export default mongoose.model<IPost>("Post", postSchema);
