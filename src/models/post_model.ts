@@ -1,5 +1,11 @@
 import mongoose from "mongoose";
 
+export interface IComment {
+  user: string;
+  body: string;
+  date: Date;
+}
+
 export interface IPost {
   _id: string;
   restaurant: string;
@@ -10,18 +16,8 @@ export interface IPost {
   comments: Array<IComment>;
 }
 
-export interface IComment {
-  user: string;
-  body: string;
-  date: Date;
-}
-
 const postSchema = new mongoose.Schema<IPost>(
   {
-    _id: {
-      type: String,
-      required: true,
-    },
     restaurant: {
       type: String,
       required: true,
@@ -44,6 +40,7 @@ const postSchema = new mongoose.Schema<IPost>(
       ref: "User",
     },
     comments: {
+      required: false,
       type: [
         {
           user: {
