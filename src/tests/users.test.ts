@@ -34,8 +34,8 @@ describe("User tests", () => {
     expect(response2.statusCode).toBe(200);
   };
 
-  test("Test Get All Users - error unauthorized", async () => {
-    const response = await request(app).get("/users");
+  test("Test Get Me - not authenticated", async () => {
+    const response = await request(app).get("/users/me");
     expect(response.statusCode).toBe(401);
   });
 
@@ -43,17 +43,15 @@ describe("User tests", () => {
     await addUser(user);
   });
 
-  test("Test Get All Users with one user in DB", async () => {
+  test("Test Get Me - authenticated", async () => {
     const response = await request(app)
-      .get("/users")
+      .get("/users/me")
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);
-    expect(response.body.length).toBe(1);
-    const us = response.body[0];
-    expect(us.fullName).toBe(user.fullName);
-    expect(us._id).toBe(user._id);
-    expect(us.email).toBe(user.email);
-    expect(us.homeCity).toBe(user.homeCity);
+    expect(response.body.fullName).toBe(user.fullName);
+    expect(response.body._id).toBe(user._id);
+    expect(response.body.email).toBe(user.email);
+    expect(response.body.homeCity).toBe(user.homeCity);
   });
 
   test("Test Post duplicate User", async () => {
@@ -61,10 +59,10 @@ describe("User tests", () => {
     expect(response.statusCode).toBe(409);
   });
 
-  test("Test PUT /users/:id", async () => {
+  test("Test PUT /users", async () => {
     const updatedUser = { ...user, fullName: "Jane Doe 33" };
     const response = await request(app)
-      .put(`/users/${user._id}`)
+      .put(`/users`)
       .send(updatedUser)
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);

@@ -39,42 +39,16 @@ import authMiddleware from "../common/auth_middleware";
  *         fullName: 'user junior'
  *         homeCity: 'Ganey Tikva'
  *         password: '1234567'
- *
  */
 
 /**
  * @swagger
- * /users:
+ * /users/me:
  *   get:
- *     summary: Returns the list of all the users
+ *     summary: Get my user by the id that is in the token
  *     tags: [Users]
- *     responses:
- *       200:
- *         description: The list of the users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- *       500:
- *         description: Unexpected error
- */
-router.get("/", authMiddleware, usersController.get.bind(usersController));
-
-/**
- * @swagger
- * /users/{:id}:
- *   get:
- *     summary: Get the user by id
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: user id
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The user description by id
@@ -87,24 +61,16 @@ router.get("/", authMiddleware, usersController.get.bind(usersController));
  *       500:
  *         description: Unexpected error
  */
-router.get(
-  "/:id",
-  authMiddleware,
-  usersController.getById.bind(usersController)
-);
+router.get("/me", authMiddleware, usersController.getMe.bind(usersController));
 
 /**
  * @swagger
- * /users/{:id}:
+ * /users:
  *   put:
- *     summary: Edit an existing user by id
+ *     summary: Edit my user by the id that is in the token
  *     tags: [Users]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/User'
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: The user edited successfully
@@ -117,10 +83,6 @@ router.get(
  *       500:
  *         description: Unexpected error
  */
-router.put(
-  "/:id",
-  authMiddleware,
-  usersController.putById.bind(usersController)
-);
+router.put("/", authMiddleware, usersController.putById.bind(usersController));
 
 export default router;

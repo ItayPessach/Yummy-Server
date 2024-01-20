@@ -83,7 +83,7 @@ router.get("/", postsController.get.bind(postsController));
 
 /**
  * @swagger
- * /posts/{:id}:
+ * /posts/{id}:
  *   get:
  *     summary: get post by id
  *     tags: [Posts]
@@ -109,7 +109,7 @@ router.get("/:id", postsController.getById.bind(postsController));
 
 /**
  * @swagger
- * /posts/{:city}:
+ * /posts/{city}:
  *   get:
  *     summary: get post by city
  *     tags: [Posts]
@@ -138,7 +138,7 @@ router.get("/city/:city", postsController.getByCity.bind(postsController));
 
 /**
  * @swagger
- * /posts/{:userId}:
+ * /posts/{userId}:
  *   get:
  *     summary: get post by user id
  *     tags: [Posts]
@@ -194,7 +194,7 @@ router.post("/", authMiddleware, postsController.post.bind(postsController));
 
 /**
  * @swagger
- * /posts/{:postId}/comment:
+ * /posts/{postId}/comment:
  *   post:
  *     summary: add comment to a post
  *     tags: [Posts]
@@ -231,7 +231,7 @@ router.post("/:postId/comment", authMiddleware, postsController.addCommentToPost
 
 /**
  * @swagger
- * /posts/{:id}:
+ * /posts/{id}:
  *   put:
  *     summary: update post by id
  *     tags: [Posts]
@@ -259,7 +259,7 @@ router.put("/:id", authMiddleware, postsController.putById.bind(postsController)
 
 /**
  * @swagger
- * /posts/{:id}:
+ * /posts/{id}:
  *   delete:
  *     summary: delete post by id
  *     tags: [Posts]
