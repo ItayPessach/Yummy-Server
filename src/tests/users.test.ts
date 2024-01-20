@@ -7,20 +7,17 @@ import { Express } from "express";
 let app: Express;
 let accessToken: string;
 const user: IUser = {
-  _id: "1234567890",
-  email: "test@.post.test",
+  email: "test@user.test",
   password: "1234567890",
   fullName: "test",
   homeCity: "test",
 };
+
 beforeAll(async () => {
   app = await initApp();
   await User.deleteMany();
 
   User.deleteMany({ email: user.email });
-  await request(app).post("/auth/register").send(user);
-  const response = await request(app).post("/auth/login").send(user);
-  accessToken = response.body.accessToken;
 });
 
 afterAll(async () => {
@@ -29,19 +26,17 @@ afterAll(async () => {
 
 describe("User tests", () => {
   const addUser = async (user: IUser) => {
-    const response = await request(app)
-      .post("/user")
-      .set("Authorization", "JWT " + accessToken)
-      .send(user);
+    const response = await request(app).post("/auth/register").send(user);
+    user._id = response.body._id;
     expect(response.statusCode).toBe(201);
+    const response2 = await request(app).post("/auth/login").send(user);
+    accessToken = response2.body.accessToken;
+    expect(response2.statusCode).toBe(200);
   };
 
-  test("Test Get All Users - empty response", async () => {
-    const response = await request(app)
-      .get("/user")
-      .set("Authorization", "JWT " + accessToken);
-    expect(response.statusCode).toBe(200);
-    expect(response.body).toStrictEqual([]);
+  test("Test Get All Users - error unauthorized", async () => {
+    const response = await request(app).get("/users");
+    expect(response.statusCode).toBe(401);
   });
 
   test("Test Post User", async () => {
@@ -50,8 +45,8 @@ describe("User tests", () => {
 
   test("Test Get All Users with one user in DB", async () => {
     const response = await request(app)
-      .get("/user")
-      .set("Authorization", "JWT " + accessToken);
+      .get("/users")
+      .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);
     expect(response.body.length).toBe(1);
     const us = response.body[0];
@@ -62,24 +57,17 @@ describe("User tests", () => {
   });
 
   test("Test Post duplicate User", async () => {
-    const response = await request(app)
-      .post("/user")
-      .set("Authorization", "JWT " + accessToken)
-      .send(user);
+    const response = await request(app).post("/auth/register").send(user);
     expect(response.statusCode).toBe(409);
   });
 
-  // test("Test PUT /user/:id", async () => {
-  //   const updatedUser = { ...user, name: "Jane Doe 33" };
-  //   const response = await request(app)
-  //     .put(`/user/${user._id}`)
-  //     .send(updatedUser);
-  //   expect(response.statusCode).toBe(200);
-  //   expect(response.body.name).toBe(updatedUser.name);
-  // });
-
-  // test("Test DELETE /user/:id", async () => {
-  //   const response = await request(app).delete(`/user/${user._id}`);
-  //   expect(response.statusCode).toBe(200);
-  // });
+  test("Test PUT /users/:id", async () => {
+    const updatedUser = { ...user, fullName: "Jane Doe 33" };
+    const response = await request(app)
+      .put(`/users/${user._id}`)
+      .send(updatedUser)
+      .set("Authorization", "Bearer " + accessToken);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.fullName).toBe(updatedUser.fullName);
+  });
 });

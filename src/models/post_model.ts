@@ -7,7 +7,7 @@ export interface IComment {
 }
 
 export interface IPost {
-  _id: string;
+  _id?: string;
   restaurant: string;
   description: string;
   image: string;

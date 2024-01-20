@@ -29,7 +29,7 @@ import authController from "../controllers/auth_controller";
  *         - email
  *         - password
  *         - fullName
- *         - city
+ *         - homeCity
  *       properties:
  *         email:
  *           type: string
@@ -40,14 +40,14 @@ import authController from "../controllers/auth_controller";
  *         fullName:
  *           type: string
  *           description: The user fullName
- *         city:
+ *         homeCity:
  *          type: string
- *          description: The user city
+ *          description: The user home city
  *       example:
  *         email: 'itay@gmail.com'
  *         password: '123456'
  *         fullName: 'itay pessach'
- *         city: 'Yehud'
+ *         homeCity: 'Yehud'
  */
 
 /**
@@ -92,7 +92,6 @@ import authController from "../controllers/auth_controller";
  *         refreshToken: '134r2134cr1x3c'
  */
 
-
 /**
  * @swagger
  * /auth/register:
@@ -121,7 +120,6 @@ import authController from "../controllers/auth_controller";
  */
 router.post("/register", authController.register);
 
-
 /**
  * @swagger
  * /auth/login:
@@ -148,7 +146,6 @@ router.post("/register", authController.register);
  */
 router.post("/login", authController.login);
 
-
 /**
  * @swagger
  * /auth/logout:
@@ -167,7 +164,6 @@ router.post("/login", authController.login);
  *         description: unexpected error
  */
 router.get("/logout", authController.logout);
-
 
 /**
  * @swagger

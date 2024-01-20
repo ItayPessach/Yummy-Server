@@ -6,8 +6,8 @@ import Post, { IPost } from "../models/post_model";
 import User, { IUser } from "../models/user_model";
 
 let app: Express;
-const user: Partial<IUser> = {
-  email: "test@.post.test",
+const user: IUser = {
+  email: "test@post.test",
   password: "1234567890",
   fullName: "test",
   homeCity: "test",
@@ -42,7 +42,7 @@ describe("post tests", () => {
   test("TEST POST post", async () => {
     const response = await request(app)
       .post("/posts")
-      .set("Authorization", "JWT " + accessToken)
+      .set("Authorization", "Bearer " + accessToken)
       .send(post);
 
     post._id = response.body._id;
@@ -73,7 +73,7 @@ describe("post tests", () => {
     expect(response.body.image).toBe(post.image);
     expect(response.body.city).toBe(post.city);
     expect(response.body.comments).toStrictEqual([]);
-  })
+  });
 
   test("Test GET posts by city", async () => {
     const response = await request(app).get("/posts/city/yehud");
@@ -92,28 +92,29 @@ describe("post tests", () => {
   test("Test PUT post", async () => {
     const response = await request(app)
       .put(`/posts/${post._id}`)
-      .set("Authorization", "JWT " + accessToken)
-      .send({city: 'tel aviv'});
+      .set("Authorization", "Bearer " + accessToken)
+      .send({ city: "tel aviv" });
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.city).toBe('tel aviv');
+    expect(response.body.city).toBe("tel aviv");
   });
 
   test("Test POST comment", async () => {
     const response = await request(app)
       .post(`/posts/${post._id}/comment`)
-      .set("Authorization", "JWT " + accessToken).send({ body: 'GDB is amazing'});
+      .set("Authorization", "Bearer " + accessToken)
+      .send({ body: "GDB is amazing" });
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveLength(1);
-    expect(response.body[0].body).toBe('GDB is amazing');
+    expect(response.body[0].body).toBe("GDB is amazing");
     expect(response.body[0].user).toBe(user._id);
   });
 
   test("Test DELETE post", async () => {
     const response = await request(app)
       .delete(`/posts/${post._id}`)
-      .set("Authorization", "JWT " + accessToken);
+      .set("Authorization", "Bearer " + accessToken);
 
     expect(response.statusCode).toBe(200);
     expect(response.body._id).toBe(post._id);

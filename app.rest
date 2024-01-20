@@ -1,20 +1,20 @@
 ###
 
-GET http://localhost:3000/student
+GET http://localhost:3000/users
 
 ###
 
-GET http://localhost:3000/student?name=John%20Doe
-
-
-###
-
-GET http://localhost:3000/student/1234567891
+GET http://localhost:3000/users?name=John%20Doe
 
 
 ###
 
-POST http://localhost:3000/student
+GET http://localhost:3000/users/1234567891
+
+
+###
+
+POST http://localhost:3000/users
 Content-Type: application/json
 
 {
