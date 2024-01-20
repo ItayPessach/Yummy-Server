@@ -2,7 +2,8 @@ import Post, { IPost } from "../models/post_model";
 import { BaseController } from "./base_controller";
 import { Request, Response } from "express";
 import { AuthRequest } from "../common/auth_middleware";
-import {logger} from "../components/logger";
+import { logger } from "../components/logger";
+import { handleSingleUploadFile } from "../utils/upload_file";
 
 class PostsController extends BaseController<IPost> {
   constructor() {
@@ -10,9 +11,18 @@ class PostsController extends BaseController<IPost> {
   }
 
   async post(req: AuthRequest, res: Response) {
-    const id = req.user._id;
-    // TODO: save post image on server uploads directory
-    req.body.user = id;
+    let uploadResult: { file: Express.Multer.File; body: unknown };
+
+    try {
+      uploadResult = await handleSingleUploadFile(req, res);
+    } catch (e) {
+      logger.error("error while trying to upload file");
+      res.status(422).json({ errors: [e.message] });
+      return;
+    }
+
+    req.body.user = req.user._id;
+    req.body.image = uploadResult.file?.filename;
     await super.post(req, res);
   }
 

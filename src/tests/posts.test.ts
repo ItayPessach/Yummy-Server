@@ -1,7 +1,8 @@
-import { Express } from "express";
 import request from "supertest";
-import { initApp } from "../app";
 import mongoose from "mongoose";
+import { Express } from "express";
+import path from "path";
+import { initApp } from "../app";
 import Post, { IPost } from "../models/post_model";
 import User, { IUser } from "../models/user_model";
 
@@ -12,6 +13,7 @@ const user: IUser = {
   fullName: "test",
   homeCity: "test",
 };
+const testImage = path.resolve(__dirname, "./test_image.png");
 
 let accessToken = "";
 
@@ -20,8 +22,15 @@ beforeAll(async () => {
   await Post.deleteMany();
 
   await User.deleteMany({ email: user.email });
-  const response = await request(app).post("/auth/register").send(user);
+  const response = await request(app)
+    .post("/auth/register")
+    .field("email", user.email)
+    .field("password", user.password)
+    .field("fullName", user.fullName)
+    .field("homeCity", user.homeCity)
+    .attach("picture", testImage);
   user._id = response.body._id;
+  post.user = user._id;
   const response2 = await request(app).post("/auth/login").send(user);
   accessToken = response2.body.accessToken;
 });
@@ -33,7 +42,6 @@ afterAll(async () => {
 const post: Partial<IPost> = {
   restaurant: "restaurant1",
   description: "description1",
-  image: "image1",
   city: "yehud",
   user: user._id,
 };
@@ -43,7 +51,11 @@ describe("post tests", () => {
     const response = await request(app)
       .post("/posts")
       .set("Authorization", "Bearer " + accessToken)
-      .send(post);
+      .field("restaurant", post.restaurant)
+      .field("description", post.description)
+      .field("city", post.city)
+      .field("user", post.user)
+      .attach("picture", testImage);
 
     post._id = response.body._id;
 
@@ -51,7 +63,25 @@ describe("post tests", () => {
     expect(response.body.user).toBe(user._id);
     expect(response.body.restaurant).toBe(post.restaurant);
     expect(response.body.description).toBe(post.description);
-    expect(response.body.image).toBe(post.image);
+    expect(response.body.image).toBeDefined();
+    expect(response.body.city).toBe(post.city);
+    expect(response.body.comments).toStrictEqual([]);
+  });
+
+  test("Test POST post without picture", async () => {
+    const response = await request(app)
+      .post("/posts")
+      .set("Authorization", "Bearer " + accessToken)
+      .field("restaurant", post.restaurant)
+      .field("description", post.description)
+      .field("city", post.city)
+      .field("user", post.user);
+
+    expect(response.statusCode).toBe(201);
+    expect(response.body.user).toBe(user._id);
+    expect(response.body.restaurant).toBe(post.restaurant);
+    expect(response.body.description).toBe(post.description);
+    expect(response.body.image).not.toBeDefined();
     expect(response.body.city).toBe(post.city);
     expect(response.body.comments).toStrictEqual([]);
   });
@@ -60,7 +90,7 @@ describe("post tests", () => {
     const response = await request(app).get("/posts");
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveLength(1);
+    expect(response.body).toHaveLength(2);
   });
 
   test("Test GET post by id", async () => {
@@ -70,7 +100,7 @@ describe("post tests", () => {
     expect(response.body.user).toBe(user._id);
     expect(response.body.restaurant).toBe(post.restaurant);
     expect(response.body.description).toBe(post.description);
-    expect(response.body.image).toBe(post.image);
+    expect(response.body.image).toBeDefined();
     expect(response.body.city).toBe(post.city);
     expect(response.body.comments).toStrictEqual([]);
   });
@@ -79,14 +109,14 @@ describe("post tests", () => {
     const response = await request(app).get("/posts/city/yehud");
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveLength(1);
+    expect(response.body).toHaveLength(2);
   });
 
   test("TEST GET post by user id", async () => {
     const response = await request(app).get(`/posts/user/${user._id}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body).toHaveLength(1);
+    expect(response.body).toHaveLength(2);
   });
 
   test("Test PUT post", async () => {

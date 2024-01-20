@@ -3,8 +3,18 @@ import User from "../models/user_model";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { logger } from "../components/logger";
+import { handleSingleUploadFile } from "../utils/upload_file";
 
 const register = async (req: Request, res: Response) => {
+  let uploadResult: { file: Express.Multer.File; body: unknown } | undefined;
+
+  try {
+    uploadResult = await handleSingleUploadFile(req, res);
+  } catch (e) {
+    logger.error("error while trying to upload file");
+    return res.status(422).json({ errors: [e.message] });
+  }
+
   const { email, password, fullName, homeCity } = req.body;
   if (!email || !password || !fullName || !homeCity) {
     logger.error(
@@ -31,6 +41,7 @@ const register = async (req: Request, res: Response) => {
       password: encryptedPassword,
       fullName: fullName,
       homeCity: homeCity,
+      profileImage: uploadResult.file?.filename,
     });
     logger.info("new user added to db");
     return res.status(201).send(user);

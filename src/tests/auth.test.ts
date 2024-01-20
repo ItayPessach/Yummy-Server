@@ -1,7 +1,8 @@
 import request from "supertest";
-import { initApp } from "../app";
 import mongoose from "mongoose";
 import { Express } from "express";
+import path from "path";
+import { initApp } from "../app";
 import User, { IUser } from "../models/user_model";
 
 let app: Express;
@@ -11,11 +12,13 @@ const user: IUser = {
   fullName: "test",
   homeCity: "test",
 };
+const testImage = path.resolve(__dirname, "./test_image.png");
 
 beforeAll(async () => {
   process.env.JWT_EXPIRATION = "4s";
   app = await initApp();
   await User.deleteMany({ email: user.email });
+  await User.deleteMany({ email: user.email + "1" });
 });
 
 afterAll(async () => {
@@ -27,20 +30,42 @@ let refreshToken: string;
 let newRefreshToken: string;
 
 describe("Auth tests", () => {
+  test("Test Register without picture", async () => {
+    const response = await request(app)
+      .post("/auth/register")
+      .field("email", user.email + "1")
+      .field("password", user.password)
+      .field("fullName", user.fullName)
+      .field("homeCity", user.homeCity);
+    expect(response.statusCode).toBe(201);
+  });
+
   test("Test Register", async () => {
-    const response = await request(app).post("/auth/register").send(user);
+    const response = await request(app)
+      .post("/auth/register")
+      .field("email", user.email)
+      .field("password", user.password)
+      .field("fullName", user.fullName)
+      .field("homeCity", user.homeCity)
+      .attach("picture", testImage);
     expect(response.statusCode).toBe(201);
   });
 
   test("Test Register exist email", async () => {
-    const response = await request(app).post("/auth/register").send(user);
+    const response = await request(app)
+      .post("/auth/register")
+      .field("email", user.email)
+      .field("password", user.password)
+      .field("fullName", user.fullName)
+      .field("homeCity", user.homeCity)
+      .attach("picture", testImage);
     expect(response.statusCode).toBe(409);
   });
 
   test("Test Register missing password", async () => {
-    const response = await request(app).post("/auth/register").send({
-      email: "test@test.com",
-    });
+    const response = await request(app)
+      .post("/auth/register")
+      .field("email", user.email);
     expect(response.statusCode).toBe(400);
   });
 
@@ -53,20 +78,20 @@ describe("Auth tests", () => {
   });
 
   test("Test forbidden access without token", async () => {
-    const response = await request(app).get("/users");
+    const response = await request(app).get("/users/me");
     expect(response.statusCode).toBe(401);
   });
 
   test("Test access with valid token", async () => {
     const response = await request(app)
-      .get("/users")
+      .get("/users/me")
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);
   });
 
   test("Test access with invalid token", async () => {
     const response = await request(app)
-      .get("/users")
+      .get("/users/me")
       .set("Authorization", "Bearer 1" + accessToken);
     expect(response.statusCode).toBe(401);
   });
@@ -75,7 +100,7 @@ describe("Auth tests", () => {
     await new Promise((resolve) => setTimeout(() => resolve("done"), 5000));
 
     const response = await request(app)
-      .get("/users")
+      .get("/users/me")
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).not.toBe(200);
   });
@@ -93,7 +118,7 @@ describe("Auth tests", () => {
     newRefreshToken = response.body.refreshToken;
 
     const response2 = await request(app)
-      .get("/users")
+      .get("/users/me")
       .set("Authorization", "Bearer " + newAccessToken);
     expect(response2.statusCode).toBe(200);
   });

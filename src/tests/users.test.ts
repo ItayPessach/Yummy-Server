@@ -1,8 +1,9 @@
 import request from "supertest";
-import { initApp } from "../app";
 import mongoose from "mongoose";
-import User, { IUser } from "../models/user_model";
 import { Express } from "express";
+import path from "path";
+import { initApp } from "../app";
+import User, { IUser } from "../models/user_model";
 
 let app: Express;
 let accessToken: string;
@@ -12,6 +13,7 @@ const user: IUser = {
   fullName: "test",
   homeCity: "test",
 };
+const testImage = path.resolve(__dirname, "./test_image.png");
 
 beforeAll(async () => {
   app = await initApp();
@@ -26,7 +28,13 @@ afterAll(async () => {
 
 describe("User tests", () => {
   const addUser = async (user: IUser) => {
-    const response = await request(app).post("/auth/register").send(user);
+    const response = await request(app)
+      .post("/auth/register")
+      .field("email", user.email)
+      .field("password", user.password)
+      .field("fullName", user.fullName)
+      .field("homeCity", user.homeCity)
+      .attach("picture", testImage); // TODO: send from the client in 'picture' field instead of 'profileImage' (same goes for posts, in which we send 'image')
     user._id = response.body._id;
     expect(response.statusCode).toBe(201);
     const response2 = await request(app).post("/auth/login").send(user);
@@ -62,7 +70,7 @@ describe("User tests", () => {
   test("Test PUT /users", async () => {
     const updatedUser = { ...user, fullName: "Jane Doe 33" };
     const response = await request(app)
-      .put(`/users`)
+      .put("/users")
       .send(updatedUser)
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);
