@@ -10,7 +10,6 @@ import authMiddleware from "../common/auth_middleware";
  *   description: The Posts API
  */
 
-
 /**
  * @swagger
  * components:
@@ -80,7 +79,6 @@ import authMiddleware from "../common/auth_middleware";
  */
 router.get("/", postsController.get.bind(postsController));
 
-
 /**
  * @swagger
  * /posts/{id}:
@@ -106,10 +104,9 @@ router.get("/", postsController.get.bind(postsController));
  */
 router.get("/:id", postsController.getById.bind(postsController));
 
-
 /**
  * @swagger
- * /posts/{city}:
+ * /posts/{city}?page={page}&pageSize={pageSize}:
  *   get:
  *     summary: get post by city
  *     tags: [Posts]
@@ -120,6 +117,16 @@ router.get("/:id", postsController.getById.bind(postsController));
  *           type: string
  *         required: true
  *         description: city name of the posts to get
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: page number for paginated results
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *         description: page size for paginated results
  *     responses:
  *       200:
  *         description: list of posts with the city name
@@ -135,20 +142,23 @@ router.get("/:id", postsController.getById.bind(postsController));
  */
 router.get("/city/:city", postsController.getByCity.bind(postsController));
 
-
 /**
  * @swagger
- * /posts/{userId}:
+ * /posts/user/me?page={page}&pageSize={pageSize}:
  *   get:
- *     summary: get post by user id
+ *     summary: get posts uploaded by me
  *     tags: [Posts]
  *     parameters:
- *       - in: path
- *         name: userId
+ *       - in: query
+ *         name: page
  *         schema:
- *           type: string
- *         required: true
- *         description: user id of the posts to get
+ *           type: integer
+ *         description: page number for paginated results
+ *       - in: query
+ *         name: pageSize
+ *         schema:
+ *           type: integer
+ *         description: page size for paginated results
  *     responses:
  *       200:
  *         description: list of posts with the user id
@@ -162,8 +172,11 @@ router.get("/city/:city", postsController.getByCity.bind(postsController));
  *       500:
  *         description: Unexpected error
  */
-router.get("/user/:userId", postsController.getByUserId.bind(postsController));
-
+router.get(
+  "/user/me",
+  authMiddleware,
+  postsController.getByMe.bind(postsController)
+);
 
 /**
  * @swagger
@@ -176,7 +189,7 @@ router.get("/user/:userId", postsController.getByUserId.bind(postsController));
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data::
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/Post'
  *     responses:
@@ -190,7 +203,6 @@ router.get("/user/:userId", postsController.getByUserId.bind(postsController));
  *          description: Error while trying to create new post
  */
 router.post("/", authMiddleware, postsController.post.bind(postsController));
-
 
 /**
  * @swagger
@@ -210,7 +222,7 @@ router.post("/", authMiddleware, postsController.post.bind(postsController));
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data::
+ *         application/json:
  *           schema:
  *             $ref: '#/components/schemas/Comment'
  *     responses:
@@ -226,8 +238,11 @@ router.post("/", authMiddleware, postsController.post.bind(postsController));
  *        409:
  *          description: Error while trying to add comment to a post
  */
-router.post("/:postId/comment", authMiddleware, postsController.addCommentToPost.bind(postsController));
-
+router.post(
+  "/:postId/comment",
+  authMiddleware,
+  postsController.addCommentToPost.bind(postsController)
+);
 
 /**
  * @swagger
@@ -254,8 +269,11 @@ router.post("/:postId/comment", authMiddleware, postsController.addCommentToPost
  *       409:
  *         description: Error while trying to update post
  */
-router.put("/:id", authMiddleware, postsController.putById.bind(postsController));
-
+router.put(
+  "/:id",
+  authMiddleware,
+  postsController.putById.bind(postsController)
+);
 
 /**
  * @swagger
@@ -282,6 +300,10 @@ router.put("/:id", authMiddleware, postsController.putById.bind(postsController)
  *       409:
  *         description: Error while trying to delete post
  */
-router.delete("/:id", authMiddleware, postsController.deleteById.bind(postsController));
+router.delete(
+  "/:id",
+  authMiddleware,
+  postsController.deleteById.bind(postsController)
+);
 
 export default router;

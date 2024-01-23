@@ -34,7 +34,7 @@ describe("User tests", () => {
       .field("password", user.password)
       .field("fullName", user.fullName)
       .field("homeCity", user.homeCity)
-      .attach("picture", testImage); // TODO: send from the client in 'picture' field instead of 'profileImage' (same goes for posts, in which we send 'image')
+      .attach("picture", testImage);
     user._id = response.body._id;
     expect(response.statusCode).toBe(201);
     const response2 = await request(app).post("/auth/login").send(user);

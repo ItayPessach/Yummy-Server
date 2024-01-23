@@ -97,7 +97,7 @@ describe("post tests", () => {
     const response = await request(app).get(`/posts/${post._id}`);
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.user).toBe(user._id);
+    expect(response.body.user._id).toBe(user._id);
     expect(response.body.restaurant).toBe(post.restaurant);
     expect(response.body.description).toBe(post.description);
     expect(response.body.image).toBeDefined();
@@ -106,14 +106,18 @@ describe("post tests", () => {
   });
 
   test("Test GET posts by city", async () => {
-    const response = await request(app).get("/posts/city/yehud");
+    const response = await request(app).get(
+      "/posts/city/yehud?page=1&pageSize=10"
+    );
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveLength(2);
   });
 
-  test("TEST GET post by user id", async () => {
-    const response = await request(app).get(`/posts/user/${user._id}`);
+  test("TEST GET posts of me", async () => {
+    const response = await request(app)
+      .get("/posts/user/me?page=1&pageSize=10")
+      .set("Authorization", "Bearer " + accessToken);
 
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveLength(2);

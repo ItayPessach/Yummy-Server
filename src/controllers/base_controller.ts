@@ -33,20 +33,6 @@ export class BaseController<ModelType> {
     }
   }
 
-  async getByFilter(
-    req: Request,
-    res: Response,
-    filter: Record<string, unknown>
-  ) {
-    try {
-      const entities = await this.model.find(filter);
-      res.send(entities);
-    } catch (err) {
-      logger.error("error get by filter");
-      res.status(500).json({ message: err.message });
-    }
-  }
-
   async post(req: Request, res: Response) {
     try {
       const entity = await this.model.create(req.body);

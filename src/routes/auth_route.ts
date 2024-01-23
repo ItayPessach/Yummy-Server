@@ -101,7 +101,7 @@ import authController from "../controllers/auth_controller";
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             $ref: '#/components/schemas/User'
  *     responses:

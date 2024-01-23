@@ -26,16 +26,51 @@ class PostsController extends BaseController<IPost> {
     await super.post(req, res);
   }
 
-  async getByCity(req: Request, res: Response) {
-    const city = req.params.city;
-
-    await super.getByFilter(req, res, { city });
+  async getById(req: Request, res: Response) {
+    try {
+      const post = await (
+        await this.model.findById(req.params.id).populate("user")
+      ).populate("comments.user");
+      res.send(post);
+    } catch (err) {
+      logger.error("error while trying to get post by id");
+      res.status(500).json({ message: err.message });
+    }
   }
 
-  async getByUserId(req: Request, res: Response) {
-    const userId = req.params.userId;
+  async getByCity(req: Request, res: Response) {
+    const city = req.params.city;
+    const page = +req.query.page;
+    const limit = +req.query.pageSize;
 
-    await super.getByFilter(req, res, { user: userId });
+    try {
+      const posts = await this.model
+        .find({ city })
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .populate("user");
+      res.send(posts);
+    } catch (err) {
+      logger.error("error while trying to get posts by city");
+      res.status(500).json({ message: err.message });
+    }
+  }
+
+  async getByMe(req: AuthRequest, res: Response) {
+    const page = +req.query.page;
+    const limit = +req.query.pageSize;
+
+    try {
+      const posts = await this.model
+        .find({ user: req.user._id })
+        .limit(limit)
+        .skip((page - 1) * limit)
+        .populate("user");
+      res.send(posts);
+    } catch (err) {
+      logger.error("error while trying to get posts by user id");
+      res.status(500).json({ message: err.message });
+    }
   }
 
   async addCommentToPost(req: AuthRequest, res: Response) {
