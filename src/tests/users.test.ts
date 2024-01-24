@@ -71,7 +71,11 @@ describe("User tests", () => {
     const updatedUser = { ...user, fullName: "Jane Doe 33" };
     const response = await request(app)
       .put("/users")
-      .send(updatedUser)
+      .field("email", updatedUser.email)
+      .field("password", updatedUser.password)
+      .field("fullName", updatedUser.fullName)
+      .field("homeCity", updatedUser.homeCity)
+      .attach("picture", testImage)
       .set("Authorization", "Bearer " + accessToken);
     expect(response.statusCode).toBe(200);
     expect(response.body.fullName).toBe(updatedUser.fullName);
