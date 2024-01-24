@@ -69,6 +69,12 @@ router.get("/me", authMiddleware, usersController.getMe.bind(usersController));
  *   put:
  *     summary: Edit my user by the id that is in the token
  *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
  *     security:
  *       - bearerAuth: []
  *     responses:
