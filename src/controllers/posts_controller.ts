@@ -82,7 +82,9 @@ class PostsController extends BaseController<IPost> {
       post.comments = [...post.comments, { ...req.body, user }];
 
       await post.save();
-      res.send(post.comments);
+
+      const populatedPost = await post.populate("comments.user");
+      res.send(populatedPost.comments);
     } catch (err) {
       logger.error("error while adding comment to a post");
       res.status(409).send("fail: " + err.message);
