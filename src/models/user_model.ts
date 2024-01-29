@@ -17,15 +17,15 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   password: {
     type: String,
-    required: true,
   },
   fullName: {
     type: String,
-    required: false,
+    required: true,
   },
   homeCity: {
     type: String,
     required: false,
+    default: 'TEL AVIV - YAFO',
   },
   profileImage: {
     type: String,

@@ -4,6 +4,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { logger } from "../components/logger";
 import { handleSingleUploadFile } from "../utils/upload_file";
+import { OAuth2Client } from 'google-auth-library';
+
+const client = new OAuth2Client();
 
 const register = async (req: Request, res: Response) => {
   let uploadResult: { file: Express.Multer.File; body: unknown } | undefined;
@@ -95,6 +98,52 @@ const login = async (req: Request, res: Response) => {
     return res.status(500).send("error while trying to login");
   }
 };
+
+const loginByGoogle = async (req: Request, res: Response) => {
+  const { token } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    let user = await User.findOne({ email: payload.email });
+
+    if (!user) {
+      user = await User.create({
+        email: payload?.email,
+        fullName: payload?.name,
+      });
+    }
+
+    const accessToken = jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRATION,
+    });
+
+    const refreshToken = jwt.sign(
+      { _id: user._id },
+      process.env.JWT_REFRESH_SECRET
+    );
+
+    if (!user.refreshTokens) {
+      user.refreshTokens = [refreshToken];
+    } else {
+      user.refreshTokens.push(refreshToken);
+    }
+
+    await user.save();
+    return res.status(200).send({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+  } catch (err) {
+    logger.error("error while trying to login by google", err);
+    res.status(500).send("error while trying to login by google");
+  }
+}
 
 const logout = async (req: Request, res: Response) => {
   const authHeader = req.headers["authorization"];
@@ -190,9 +239,11 @@ const refresh = async (req: Request, res: Response) => {
     }
   );
 };
+
 export default {
   register,
   login,
   logout,
   refresh,
+  loginByGoogle,
 };

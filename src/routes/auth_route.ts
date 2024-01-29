@@ -188,4 +188,27 @@ router.get("/logout", authController.logout);
  */
 router.get("/refresh", authController.refresh);
 
+
+/**
+ * @swagger
+ * /auth/google-login:
+ *   post:
+ *     summary: login a user by google
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *     responses:
+ *       200:
+ *         description: The access & refresh tokens
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Tokens'
+ *       401:
+ *         description: email or password is incorrect
+ */
+router.post("/google-login", authController.loginByGoogle);
+
 export default router;
