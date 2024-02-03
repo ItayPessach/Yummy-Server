@@ -18,7 +18,7 @@ export class BaseController<ModelType> {
         res.send(entities);
       }
     } catch (err) {
-      logger.error("error get all");
+      logger.error("error get all", err);
       res.status(500).json({ message: err.message });
     }
   }
@@ -28,7 +28,7 @@ export class BaseController<ModelType> {
       const entity = await this.model.findById(req.params.id);
       res.send(entity);
     } catch (err) {
-      logger.error("error get by id");
+      logger.error("error get by id", err);
       res.status(500).json({ message: err.message });
     }
   }
@@ -38,7 +38,7 @@ export class BaseController<ModelType> {
       const entity = await this.model.create(req.body);
       res.status(201).send(entity);
     } catch (err) {
-      logger.error("error post");
+      logger.error("error post", err);
       res.status(409).send("fail: " + err.message);
     }
   }
@@ -52,7 +52,7 @@ export class BaseController<ModelType> {
       );
       res.send(entity);
     } catch (err) {
-      logger.error("error put");
+      logger.error("error put", err);
       res.status(409).send("fail: " + err.message);
     }
   }
@@ -62,7 +62,7 @@ export class BaseController<ModelType> {
       const entity = await this.model.findByIdAndDelete(req.params.id);
       res.send(entity);
     } catch (err) {
-      logger.error("error delete");
+      logger.error("error delete", err);
       res.status(409).send("fail: " + err.message);
     }
   }

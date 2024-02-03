@@ -26,6 +26,22 @@ class PostsController extends BaseController<IPost> {
     await super.post(req, res);
   }
 
+  async putById(req: AuthRequest, res: Response) {
+    let uploadResult: { file: Express.Multer.File; body: unknown };
+
+    try {
+      uploadResult = await handleSingleUploadFile(req, res);
+    } catch (e) {
+      logger.error("error while trying to upload file");
+      res.status(422).json({ errors: [e.message] });
+      return;
+    }
+
+    req.body.user = req.user._id;
+    req.body.image = uploadResult.file?.filename;
+    await super.putById(req, res);
+  }
+
   async getById(req: Request, res: Response) {
     try {
       const post = await (
@@ -43,11 +59,14 @@ class PostsController extends BaseController<IPost> {
     const page = +req.query.page;
     const limit = +req.query.pageSize;
 
+    const findFilter = city === 'all' ? {} : { city };
+
     try {
       const posts = await this.model
-        .find({ city })
+        .find(findFilter)
         .limit(limit)
         .skip((page - 1) * limit)
+        .sort({ createdAt: -1 })
         .populate("user");
       res.send(posts);
     } catch (err) {
@@ -65,6 +84,7 @@ class PostsController extends BaseController<IPost> {
         .find({ user: req.user._id })
         .limit(limit)
         .skip((page - 1) * limit)
+        .sort({ createdAt: -1 })
         .populate("user");
       res.send(posts);
     } catch (err) {

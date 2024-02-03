@@ -24,8 +24,6 @@ const userSchema = new mongoose.Schema<IUser>({
   },
   homeCity: {
     type: String,
-    required: false,
-    default: 'TEL AVIV - YAFO',
   },
   profileImage: {
     type: String,

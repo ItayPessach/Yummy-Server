@@ -19,10 +19,11 @@ const register = async (req: Request, res: Response) => {
   }
 
   const { email, password, fullName, homeCity } = req.body;
-  if (!email || !password || !fullName || !homeCity) {
+  if (!email || !password || !fullName) {
     logger.error(
-      "missing one of the following: email, password, fullName, homeCity"
+      "missing one of the following: email, password, fullName"
     );
+
     return res
       .status(400)
       .send(
@@ -46,6 +47,7 @@ const register = async (req: Request, res: Response) => {
       homeCity: homeCity,
       profileImage: uploadResult.file?.filename,
     });
+
     logger.info("new user added to db");
     return res.status(201).send(user);
   } catch (err) {
@@ -57,6 +59,7 @@ const register = async (req: Request, res: Response) => {
 const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
+
   if (!email || !password) {
     logger.error("missing email or password");
     return res.status(400).send("missing email or password");
@@ -66,7 +69,7 @@ const login = async (req: Request, res: Response) => {
     const user = await User.findOne({ email: email });
     if (!user) {
       logger.error("email is incorrect");
-      return res.status(401).send("email");
+      return res.status(401).send("email is incorrect");
     }
 
     const match = await bcrypt.compare(password, user.password);
