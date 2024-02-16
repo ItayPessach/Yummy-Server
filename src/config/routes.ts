@@ -1,10 +1,10 @@
 import { Express } from "express";
-import studentRoute from "../routes/student_route";
-import studentPostRoute from "../routes/student_post_route";
+import usersRoute from "../routes/users_route";
+import postsRoute from "../routes/posts_route";
 import authRoute from "../routes/auth_route";
 
 export const configRoutes = (app: Express) => {
-    app.use("/student", studentRoute);
-    app.use("/studentpost", studentPostRoute);
-    app.use("/auth", authRoute);
+  app.use("/users", usersRoute);
+  app.use("/posts", postsRoute);
+  app.use("/auth", authRoute);
 };
