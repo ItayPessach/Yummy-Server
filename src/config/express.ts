@@ -12,7 +12,5 @@ export const configExpress = (app: Express) => {
   app.use(expressStatic(path.join(__dirname, "../../public")));
 
   configRoutes(app);
-  if (process.env.NODE_ENV === "development") {
-    configSwagger(app);
-  }
+  configSwagger(app);
 };
