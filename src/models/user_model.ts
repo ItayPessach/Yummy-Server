@@ -11,11 +11,11 @@ export interface IUser {
 }
 
 const userSchema = new mongoose.Schema<IUser>({
-  email: {
+  username: {
     type: String,
     required: true,
   },
-  password: {
+  fullname: {
     type: String,
   },
   fullName: {
