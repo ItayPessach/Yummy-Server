@@ -142,7 +142,7 @@ describe("post tests", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveLength(1);
     expect(response.body[0].body).toBe("GDB is amazing");
-    expect(response.body[0].user).toBe(user._id);
+    expect(response.body[0].user._id).toBe(user._id);
   });
 
   test("Test DELETE post", async () => {
